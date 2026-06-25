@@ -55,11 +55,6 @@ int main(int argc, char * argv[])
   }
 
   std::istream & in = inFile.empty() ? std::cin : static_cast< std::istream & >(fin);
-  in >> std::ws;
-  if (in.eof())
-  {
-    return 2;
-  }
   ulanova::ParseResult result = ulanova::readPersons(in);
   fin.close();
 
@@ -78,6 +73,10 @@ int main(int argc, char * argv[])
   std::ostream & out = outFile.empty() ? std::cout : static_cast< std::ostream & >(fout);
 
   ulanova::printPersons(result.persons, out);
+  if (result.persons.size == 0)
+  {
+    out << "\n";
+  }
   std::cerr << result.accepted << " " << result.ignored << "\n";
   ulanova::clear(result.persons);
   return 0;
