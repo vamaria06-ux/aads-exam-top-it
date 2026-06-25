@@ -3,25 +3,26 @@
 #include <string>
 #include "person.hpp"
 
-int main(int c, char** v)
+int main(int argc, char* argv[])
 {
-  if (c > 3) return 1;
-
-  std::string f_in = "", f_out = "";
-  bool has_in = 0, has_out = 0;
-
-  for (int i = 1; i < c; ++i)
+  if (argc > 3)
   {
-    std::string arg = v[i];
-    if (arg.substr(0, 3) == "in:" && !has_in)
+    return 1;
+  }
+
+  std::string file_in = "";
+  std::string file_out = "";
+
+  for (int i = 1; i < argc; ++i)
+  {
+    std::string arg = argv[i];
+    if (!arg.find("in:"))
     {
-      f_in = arg.substr(3);
-      has_in = 1;
+      file_in = arg.substr(3);
     }
-    else if (arg.substr(0, 4) == "out:" && !has_out)
+    else if (!arg.find("out:"))
     {
-      f_out = arg.substr(4);
-      has_out = 1;
+      file_out = arg.substr(4);
     }
     else
     {
@@ -29,45 +30,29 @@ int main(int c, char** v)
     }
   }
 
-  std::istream* sin = &std::cin;
-  std::ostream* sout = &std::cout;
-  std::ifstream f1;
-  std::ofstream f2;
+  std::istream* in = &std::cin;
+  std::ostream* out = &std::cout;
+  std::ifstream fin;
+  std::ofstream fout;
 
-  if (has_in)
+  if (file_in != "")
   {
-    f1.open(f_in);
-    if (!f1.is_open()) return 2;
-    sin = &f1;
-  }
-
-  if (has_out)
-  {
-    f2.open(f_out);
-    if (!f2.is_open()) return 2;
-    sout = &f2;
-  }
-
-  petrov::Person* arr = nullptr;
-  size_t sz = 0, cap = 0;
-  size_t ok = 0, err = 0;
-
-  while (*sin)
-  {
-    size_t id;
-    if (!(*sin >> id))
+    fin.open(file_in);
+    if (!fin.is_open())
     {
-      sin->clear();
-      std::string s;
-      if (std::getline(*sin, s))
-      {
-        if (s.find_first_not_of(" \t\r\n") != std::string::npos)
-        {
-          err++;
-        }
-      }
-      continue;
+      return 2;
     }
+    in = &fin;
+  }
+
+  if (file_out != "")
+  {
+    fout.open(file_out);
+    if (!fout.is_open())
+    {
+      return 2;
+    }
+    out = &fout;
   }
   return 0;
 }
