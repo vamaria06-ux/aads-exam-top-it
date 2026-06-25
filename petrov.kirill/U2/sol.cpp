@@ -118,5 +118,44 @@ namespace petrov
         ps.s = ps.s + 1;
       }
     }
+
+    std::ifstream f_dt(df.c_str());
+    if (!f_dt) {
+      std::cerr << "open err\n";
+      delete[] ps.dat;
+      delete[] ms.dat;
+      return 2;
+    }
+    size_t id1 = 0;
+    size_t id2 = 0;
+    size_t len = 0;
+    while (f_dt >> id1 >> id2 >> len) {
+      if (id1 == id2) {
+        continue;
+      }
+      bool f1 = false;
+      bool f2 = false;
+      for (size_t i = 0; i < ps.s; ++i) {
+        if (ps.dat[i].id == id1) {
+          f1 = true;
+        }
+        if (ps.dat[i].id == id2) {
+          f2 = true;
+        }
+      }
+      if (!f1) {
+        if (ps.s == ps.c) {
+          size_t nc = ps.c * 2;
+          if (nc == 0) {
+            nc = 2;
+          }
+          Person* nd = new Person[nc];
+          for (size_t i = 0; i < ps.s; ++i) {
+            nd[i] = ps.dat[i];
+          }
+          delete[] ps.dat;
+          ps.dat = nd;
+          ps.c = nc;
+        }
   }
 }
