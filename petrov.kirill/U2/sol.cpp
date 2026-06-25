@@ -52,5 +52,42 @@ namespace petrov
     }
     Pvec ps = {nullptr, 0, 0};
     Mvec ms = {nullptr, 0, 0};
+
+    if (!inf.empty())
+    {
+      std::ifstream fin(inf.c_str());
+      if (!fin)
+      {
+        std::cerr << "err\n";
+        delete[] ps.dat;
+        delete[] ms.dat;
+        return 2;
+      }
+      std::string l = "";
+      while (std::getline(fin, l))
+      {
+        size_t id = 0;
+        while (id < l.size() && (l[id] == ' ' || l[id] == '\t')) {
+          id = id + 1;
+        }
+        if (id == l.size()) {
+          continue;
+        }
+        if (l[id] < '0' || l[id] > '9') {
+          continue;
+        }
+        size_t num = 0;
+        while (id < l.size() && l[id] >= '0' && l[id] <= '9') {
+          num = num * 10 + static_cast<size_t>(l[id] - '0');
+          id = id + 1;
+        }
+        while (id < l.size() && (l[id] == ' ' || l[id] == '\t')) {
+          id = id + 1;
+        }
+        if (id == l.size()) {
+          continue;
+        }
+      }
+    }
   }
 }
