@@ -7,6 +7,12 @@
 
 int main(int argc, char * argv[])
 {
+  if (argc > 3)
+  {
+    std::cerr << "Too many arguments\n";
+    return 1;
+  }
+
   std::string inFile;
   std::string outFile;
   for (int i = 1; i < argc; ++i)
@@ -36,11 +42,6 @@ int main(int argc, char * argv[])
       return 1;
     }
   }
-  if (argc > 3)
-  {
-    std::cerr << "Too many arguments\n";
-    return 1;
-  }
 
   std::ifstream fin;
   if (!inFile.empty())
@@ -64,8 +65,8 @@ int main(int argc, char * argv[])
     }
   }
 
-  std::istream & in = inFile.empty() ? std::cin : fin;
-  std::ostream & out = outFile.empty() ? std::cout : fout;
+  std::istream & in = inFile.empty() ? std::cin : static_cast< std::istream & >(fin);
+  std::ostream & out = outFile.empty() ? std::cout : static_cast< std::ostream & >(fout);
 
   ulanova::ParseResult result = ulanova::readPersons(in);
   ulanova::printPersons(result.persons, out);

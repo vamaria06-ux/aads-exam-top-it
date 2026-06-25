@@ -13,10 +13,14 @@ namespace ulanova
     std::string line;
     while (std::getline(in, line))
     {
+      if (line.empty())
+      {
+        continue;
+      }
       size_t id = 0;
       size_t pos = 0;
       bool valid = false;
-      while (pos < line.size() && line[pos] == ' ')
+      while (pos < line.size() && (line[pos] == ' ' || line[pos] == '\t'))
       {
         ++pos;
       }
@@ -31,7 +35,7 @@ namespace ulanova
         ++ignoredCount;
         continue;
       }
-      while (pos < line.size() && line[pos] == ' ')
+      while (pos < line.size() && (line[pos] == ' ' || line[pos] == '\t'))
       {
         ++pos;
       }
