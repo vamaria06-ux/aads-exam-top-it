@@ -9,7 +9,7 @@
 namespace ulanova
 {
   void runCommands(Array< Person > & persons,
-      const Array< Meet > & meets,
+      Array< Meet > & meets,
       std::istream & in,
       std::ostream & out);
 }
