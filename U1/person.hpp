@@ -24,10 +24,10 @@ namespace petrov
       delete[] vec;
       vec = new_v;
       c = new_c;
-      vec[++s] = p;
+      vec[s++] = p;
       return;
     }
-    vec[++s] = p;
+    vec[s++] = p;
   }
 }
 
