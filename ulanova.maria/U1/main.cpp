@@ -42,30 +42,30 @@ int main(int argc, char * argv[])
     return 1;
   }
 
-  std::ifstream in;
+  std::ifstream fin;
   if (!inFile.empty())
   {
-    in.open(inFile);
-    if (!in.is_open())
+    fin.open(inFile);
+    if (!fin.is_open())
     {
       std::cerr << "Cannot open input file: " << inFile << "\n";
       return 2;
     }
   }
 
-  std::ofstream out;
+  std::ofstream fout;
   if (!outFile.empty())
   {
-    out.open(outFile);
-    if (!out.is_open())
+    fout.open(outFile);
+    if (!fout.is_open())
     {
       std::cerr << "Cannot open output file: " << outFile << "\n";
       return 2;
     }
   }
 
-  std::istream & in = inFile.empty() ? std::cin : in;
-  std::ostream & out = outFile.empty() ? std::cout : out;
+  std::istream & in = inFile.empty() ? std::cin : fin;
+  std::ostream & out = outFile.empty() ? std::cout : fout;
 
   ulanova::Array< ulanova::Person > arr = ulanova::readPersons(in);
   ulanova::printPersons(arr, out);
