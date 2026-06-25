@@ -7,6 +7,12 @@
 
 int main(int argc, char * argv[])
 {
+  if (argc > 3)
+  {
+    std::cerr << "Too many arguments\n";
+    return 0;
+  }
+
   std::string inFile;
   std::string outFile;
   for (int i = 1; i < argc; ++i)
@@ -36,11 +42,6 @@ int main(int argc, char * argv[])
       return 1;
     }
   }
-  if (argc > 3)
-  {
-    std::cerr << "Too many arguments\n";
-    return 1;
-  }
 
   std::ifstream fin;
   if (!inFile.empty())
@@ -53,6 +54,10 @@ int main(int argc, char * argv[])
     }
   }
 
+  std::istream & in = inFile.empty() ? std::cin : static_cast< std::istream & >(fin);
+  ulanova::ParseResult result = ulanova::readPersons(in);
+  fin.close();
+
   std::ofstream fout;
   if (!outFile.empty())
   {
@@ -60,16 +65,19 @@ int main(int argc, char * argv[])
     if (!fout.is_open())
     {
       std::cerr << "Cannot open output file: " << outFile << "\n";
+      ulanova::clear(result.persons);
       return 2;
     }
   }
 
-  std::istream & in = inFile.empty() ? std::cin : fin;
-  std::ostream & out = outFile.empty() ? std::cout : fout;
+  std::ostream & out = outFile.empty() ? std::cout : static_cast< std::ostream & >(fout);
 
-  ulanova::Array< ulanova::Person > arr = ulanova::readPersons(in);
-  ulanova::printPersons(arr, out);
-  std::cerr << arr.size << " " << ulanova::ignored << "\n";
-  ulanova::clear(arr);
+  ulanova::printPersons(result.persons, out);
+  if (result.persons.size == 0)
+  {
+    out << "\n";
+  }
+  std::cerr << result.accepted << " " << result.ignored << "\n";
+  ulanova::clear(result.persons);
   return 0;
 }
