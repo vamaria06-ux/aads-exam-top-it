@@ -53,7 +53,7 @@ namespace ulanova
     arr.data[arr.size++] = val;
   }
 
-  bool containsId(const Array< Person > & arr, std::size_t id);
+  bool containsId(const Array< Person > & arr, size_t id);
   void printPersons(const Array< Person > & arr, std::ostream & out);
 }
 
