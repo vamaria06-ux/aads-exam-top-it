@@ -54,6 +54,11 @@ int main(int argc, char * argv[])
     }
   }
 
+  std::istream & in = inFile.empty() ? std::cin : static_cast< std::istream & >(fin);
+
+  ulanova::ParseResult result = ulanova::readPersons(in);
+  fin.close();
+
   std::ofstream fout;
   if (!outFile.empty())
   {
@@ -61,16 +66,18 @@ int main(int argc, char * argv[])
     if (!fout.is_open())
     {
       std::cerr << "Cannot open output file: " << outFile << "\n";
+      ulanova::clear(result.persons);
       return 2;
     }
   }
 
-  std::istream & in = inFile.empty() ? std::cin : static_cast< std::istream & >(fin);
   std::ostream & out = outFile.empty() ? std::cout : static_cast< std::ostream & >(fout);
 
-  ulanova::ParseResult result = ulanova::readPersons(in);
   ulanova::printPersons(result.persons, out);
-  std::cerr << result.persons.size << " " << result.ignored << "\n";
+  if (result.persons.size > 0 || result.ignored > 0)
+  {
+    std::cerr << result.persons.size << " " << result.ignored << "\n";
+  }
   ulanova::clear(result.persons);
   return 0;
 }
