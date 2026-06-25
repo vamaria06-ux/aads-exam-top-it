@@ -4,6 +4,7 @@
 
 #include <string>
 #include <iostream>
+#include <fstream>
 
 namespace ulanova
 {
@@ -203,6 +204,94 @@ namespace ulanova
     clear(tmp);
   }
 
+  static void cmdCommons(const Array< Meet > & meets,
+      size_t id1,
+      size_t id2,
+      std::ostream & out)
+  {
+    Array< size_t > commons = mArray< size_t >();
+    for (size_t i = 0; i < meets.size; ++i)
+    {
+      const size_t a = meets.data[i].id1;
+      const size_t b = meets.data[i].id2;
+      size_t other = meets.size;
+      if (a == id1)
+      {
+        other = b;
+      }
+      else if (b == id1)
+      {
+        other = a;
+      }
+      if (other == meets.size || other == id1 || other == id2)
+      {
+        continue;
+      }
+      bool met2 = false;
+      for (size_t j = 0; j < meets.size; ++j)
+      {
+        if ((meets.data[j].id1 == id2 && meets.data[j].id2 == other)
+            || (meets.data[j].id2 == id2 && meets.data[j].id1 == other))
+        {
+          met2 = true;
+          break;
+        }
+      }
+      if (!met2)
+      {
+        continue;
+      }
+      bool found = false;
+      for (size_t k = 0; k < commons.size; ++k)
+      {
+        if (commons.data[k] == other)
+        {
+          found = true;
+          break;
+        }
+      }
+      if (!found)
+      {
+        pushBack(commons, other);
+      }
+    }
+    for (size_t i = 0; i < commons.size; ++i)
+    {
+      for (size_t j = i + 1; j < commons.size; ++j)
+      {
+        if (commons.data[i] > commons.data[j])
+        {
+          const size_t tmp = commons.data[i];
+          commons.data[i] = commons.data[j];
+          commons.data[j] = tmp;
+        }
+      }
+    }
+    for (size_t i = 0; i < commons.size; ++i)
+    {
+      out << commons.data[i] << "\n";
+    }
+    clear(commons);
+  }
+
+  static void cmdOutPersons(const Array< Person > & persons, const std::string & filename)
+  {
+    std::ofstream fout(filename);
+    if (!fout.is_open())
+    {
+      std::cout << "<INVALID COMMAND>\n";
+      return;
+    }
+    for (size_t i = 0; i < persons.size; ++i)
+    {
+      if (!persons.data[i].info.empty())
+      {
+        fout << persons.data[i].id << " " << persons.data[i].info << "\n";
+      }
+    }
+  }
+
+
   void runCommands(Array< Person > & persons,
       Array< Meet > & meets,
       std::istream & in,
@@ -286,6 +375,27 @@ namespace ulanova
           continue;
         }
         cmdLessGreater(meets, id, time, false, out);
+      }
+      else if (cmd == "commons")
+      {
+        size_t id1 = 0;
+        size_t id2 = 0;
+        if (!(in >> id1 >> id2))
+        {
+          out << "<INVALID COMMAND>\n";
+          continue;
+        }
+        cmdCommons(meets, id1, id2, out);
+      }
+      else if (cmd == "out-persons")
+      {
+        std::string filename;
+        if (!(in >> filename))
+        {
+          out << "<INVALID COMMAND>\n";
+          continue;
+        }
+        cmdOutPersons(persons, filename);
       }
       else
       {
