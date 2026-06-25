@@ -87,6 +87,35 @@ namespace petrov
         if (id == l.size()) {
           continue;
         }
+        std::string txt = l.substr(id);
+        bool dup = false;
+        for (size_t i = 0; i < ps.s; ++i) {
+          if (ps.dat[i].id == num) {
+            dup = true;
+            break;
+          }
+        }
+        if (dup) {
+          continue;
+        }
+        if (ps.s == ps.c) {
+          size_t nc = ps.c * 2;
+          if (nc == 0) {
+            nc = 2;
+          }
+          Person* nd = new Person[nc];
+          for (size_t i = 0; i < ps.s; ++i) {
+            nd[i] = ps.dat[i];
+          }
+          delete[] ps.dat;
+          ps.dat = nd;
+          ps.c = nc;
+        }
+        ps.dat[ps.s].id = num;
+        ps.dat[ps.s].info = txt;
+        ps.dat[ps.s].h_i = 1;
+        ps.dat[ps.s].del = 0;
+        ps.s = ps.s + 1;
       }
     }
   }
