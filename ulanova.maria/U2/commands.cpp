@@ -69,6 +69,62 @@ namespace ulanova
     out << persons.data[idx].info << "\n";
   }
 
+  static void cmdRedesc(Array< Person > & persons, size_t id, const std::string & desc)
+  {
+    const size_t idx = findPerson(persons, id);
+    if (idx == persons.size)
+    {
+      pushBack(persons, Person{id, desc});
+      return;
+    }
+    persons.data[idx].info = desc;
+  }
+
+  static void cmdDeanon(Array< Person > & persons,
+      Array< Meet > & meets,
+      size_t anonId,
+      size_t id)
+  {
+    if (hasDesc(persons, anonId) || !hasDesc(persons, id))
+    {
+      std::cout << "<INVALID COMMAND>\n";
+      return;
+    }
+    for (size_t i = 0; i < meets.size; ++i)
+    {
+      if (meets.data[i].id1 == anonId)
+      {
+        meets.data[i].id1 = id;
+      }
+      else if (meets.data[i].id2 == anonId)
+      {
+        meets.data[i].id2 = id;
+      }
+    }
+    Array< Meet > filtered = mArray< Meet >();
+    for (size_t i = 0; i < meets.size; ++i)
+    {
+      if (meets.data[i].id1 != meets.data[i].id2)
+      {
+        pushBack(filtered, meets.data[i]);
+      }
+    }
+    clear(meets);
+    meets = filtered;
+    for (size_t i = 0; i < persons.size; ++i)
+    {
+      if (persons.data[i].id == anonId)
+      {
+        for (size_t j = i; j < persons.size - 1; ++j)
+        {
+          persons.data[j] = persons.data[j + 1];
+        }
+        --persons.size;
+        break;
+      }
+    }
+  }
+
   void runCommands(Array< Person > & persons,
       Array< Meet > & meets,
       std::istream & in,
@@ -90,6 +146,36 @@ namespace ulanova
           continue;
         }
         cmdDesc(persons, id, out);
+      }
+      else if (cmd == "deanon")
+      {
+        size_t anonId = 0;
+        size_t id = 0;
+        if (!(in >> anonId >> id))
+        {
+          out << "<INVALID COMMAND>\n";
+          continue;
+        }
+        cmdDeanon(persons, meets, anonId, id);
+      }
+      else if (cmd == "redesc")
+      {
+        size_t id = 0;
+        if (!(in >> id))
+        {
+          out << "<INVALID COMMAND>\n";
+          continue;
+        }
+        std::string desc;
+        char ch = 0;
+        while (in.get(ch) && ch != '"')
+        {
+        }
+        while (in.get(ch) && ch != '"')
+        {
+          desc += ch;
+        }
+        cmdRedesc(persons, id, desc);
       }
       else
       {
