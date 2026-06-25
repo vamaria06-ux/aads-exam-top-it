@@ -10,6 +10,7 @@ namespace ulanova
   struct ParseResult
   {
     Array< Person > persons;
+    size_t accepted;
     size_t ignored;
   };
 
