@@ -1,6 +1,7 @@
 #ifndef PERSON_HPP
 #define PERSON_HPP
 #include <string>
+#include <iostream>
 
 namespace petrov
 {
@@ -8,6 +9,25 @@ namespace petrov
   {
     size_t id;
     std::string info;
+  };
+
+  void push_new(Person* vec, size_t s, size_t c, Person p)
+  {
+    if (s == c)
+    {
+      size_t new_c = c * 2;
+      Person* new_v = new Person[new_c];
+      for (size_t i = 0; i < s; ++i)
+      {
+        new_v[i] = vec[i];
+        delete vec[i];
+      }
+      delete[] vec;
+      vec = new_v;
+      c = new_c;
+    } else {
+      vec[++s] = p;
+    }
   }
 }
 
