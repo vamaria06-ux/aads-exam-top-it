@@ -1,55 +1,79 @@
-#include "parse.hpp"
 #include "io.hpp"
+#include "parse.hpp"
 
-#include <string>
 #include <iostream>
+#include <fstream>
+#include <string>
 
-namespace ulanova
+int main(int argc, char * argv[])
 {
-  static bool readPerson(std::istream & in, Person & person)
+  if (argc > 3)
   {
-    size_t id = 0;
-    if (!(in >> id))
-    {
-      in.clear();
-      std::string skip;
-      std::getline(in, skip);
-      return false;
-    }
-    while (in.peek() == ' ' || in.peek() == '\t')
-    {
-      in.ignore();
-    }
-    std::string info;
-    std::getline(in, info);
-    if (info.empty())
-    {
-      return false;
-    }
-    person = Person{id, info};
-    return true;
+    std::cerr << "Too many arguments\n";
+    return 0;
   }
 
-  ParseResult readPersons(std::istream & in)
+  std::string inFile;
+  std::string outFile;
+  for (int i = 1; i < argc; ++i)
   {
-    Array< Person > arr = mArray< Person >();
-    size_t accepted = 0;
-    size_t ignored = 0;
-    in >> std::ws;
-    while (!in.eof())
+    const std::string arg(argv[i]);
+    if (arg.size() > 3 && std::string(arg.begin(), arg.begin() + 3) == "in:")
     {
-      Person p{0, ""};
-      if (readPerson(in, p) && !containsId(arr, p.id))
+      if (!inFile.empty())
       {
-        pushBack(arr, p);
-        ++accepted;
+        std::cerr << "Duplicate input file argument\n";
+        return 1;
       }
-      else
-      {
-        ++ignored;
-      }
-      in >> std::ws;
+      inFile = std::string(arg.begin() + 3, arg.end());
     }
-    return ParseResult{arr, accepted, ignored};
+    else if (arg.size() > 4 && std::string(arg.begin(), arg.begin() + 4) == "out:")
+    {
+      if (!outFile.empty())
+      {
+        std::cerr << "Duplicate output file argument\n";
+        return 1;
+      }
+      outFile = std::string(arg.begin() + 4, arg.end());
+    }
+    else
+    {
+      std::cerr << "Unknown argument: " << arg << "\n";
+      return 1;
+    }
   }
+
+  std::ifstream fin;
+  if (!inFile.empty())
+  {
+    fin.open(inFile);
+    if (!fin.is_open())
+    {
+      std::cerr << "Cannot open input file: " << inFile << "\n";
+      return 2;
+    }
+  }
+
+  std::istream & in = inFile.empty() ? std::cin : static_cast< std::istream & >(fin);
+  ulanova::ParseResult result = ulanova::readPersons(in);
+  fin.close();
+
+  std::ofstream fout;
+  if (!outFile.empty())
+  {
+    fout.open(outFile);
+    if (!fout.is_open())
+    {
+      std::cerr << "Cannot open output file: " << outFile << "\n";
+      ulanova::clear(result.persons);
+      return 2;
+    }
+  }
+
+  std::ostream & out = outFile.empty() ? std::cout : static_cast< std::ostream & >(fout);
+
+  ulanova::printPersons(result.persons, out);
+  std::cerr << result.accepted << " " << result.ignored << "\n";
+  ulanova::clear(result.persons);
+  return 0;
 }
